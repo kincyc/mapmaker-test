@@ -41,13 +41,13 @@ PROJECT_PATH = f"/tmp/{PROJECT_NAME.replace(' ', '_')}.qgz"
 OUTPUT_IMAGE = os.getenv("OUTPUT_IMAGE", "/tmp/rendered_map.png")
 
 # Map render settings
-CENTER_LAT = float(os.getenv("CENTER_LAT", 38.5261676))
-CENTER_LON = float(os.getenv("CENTER_LON", -122.0200417))
+CENTER_LAT = float(os.getenv("CENTER_LAT", -13583211.8))
+CENTER_LON = float(os.getenv("CENTER_LON", 4654056.0))
 SCALE = int(os.getenv("SCALE", 5000))
 DPI = int(os.getenv("DPI", 96))
 WIDTH = int(os.getenv("WIDTH", 1024))
 HEIGHT = int(os.getenv("HEIGHT", 768))
-LAYER_NAMES = ["Footprint Pushpin", "USDA WRC 2024", "NAIP/USDA_CONUS_PRIME"]
+LAYER_NAMES = ["Footprint Pushpin", "USDA WRC 2024", "OpenStreetMap"]
 
 # -------------------------
 # Step 1: Extract QGIS Project from DB
@@ -100,6 +100,13 @@ map_settings = QgsMapSettings()
 map_settings.setLayers(layers)
 map_settings.setOutputSize(QSize(WIDTH, HEIGHT))
 map_settings.setBackgroundColor(QColor("white"))
+
+from qgis.core import QgsCoordinateReferenceSystem
+
+# Force destination CRS to avoid PROJ pipeline errors
+forced_crs = QgsCoordinateReferenceSystem("EPSG:3857")  # or "EPSG:4326"
+map_settings.setDestinationCrs(forced_crs)
+
 
 # Convert center point
 crs_src = QgsCoordinateReferenceSystem("EPSG:4326")
