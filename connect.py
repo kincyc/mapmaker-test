@@ -18,6 +18,8 @@ from qgis.core import (
 )
 from qgis.PyQt.QtGui import QImage, QPainter
 from qgis.PyQt.QtCore import QSize, QPointF
+from qgis.PyQt.QtGui import QColor
+
 
 # -------------------------
 # Load environment variables
@@ -96,7 +98,7 @@ if len(layers) < len(LAYER_NAMES):
 map_settings = QgsMapSettings()
 map_settings.setLayers(layers)
 map_settings.setOutputSize(QSize(WIDTH, HEIGHT))
-map_settings.setBackgroundColor("white")
+map_settings.setBackgroundColor(QColor("white"))
 
 # Convert center point
 crs_src = QgsCoordinateReferenceSystem("EPSG:4326")
