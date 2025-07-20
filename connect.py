@@ -1,6 +1,11 @@
 import os
 import psycopg2
 import site, sys
+
+site.addsitedir("/home/ubuntu/mapmaker-test/.venv/lib/python3.10/site-packages")
+sys.path.append("/usr/share/qgis/python")
+sys.path.append("/usr/lib/python3/dist-packages")
+
 from dotenv import load_dotenv
 from qgis.core import (
     QgsApplication,
@@ -19,9 +24,6 @@ from qgis.PyQt.QtCore import QSize, QPointF
 # -------------------------
 load_dotenv()
 
-site.addsitedir("/home/ubuntu/mapmaker-test/.venv/lib/python3.10/site-packages")
-sys.path.append("/usr/share/qgis/python")
-sys.path.append("/usr/lib/python3/dist-packages")
 
 PG_PARAMS = {
     "host": os.getenv("PG_HOST"),
