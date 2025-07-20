@@ -1,7 +1,9 @@
 import os
 import psycopg2
-import site, sys
+import site
+import sys
 
+# Inject venv + system paths
 site.addsitedir("/home/ubuntu/mapmaker-test/.venv/lib/python3.10/site-packages")
 sys.path.append("/usr/share/qgis/python")
 sys.path.append("/usr/lib/python3/dist-packages")
@@ -12,21 +14,17 @@ from qgis.core import (
     QgsProject,
     QgsMapSettings,
     QgsCoordinateReferenceSystem,
-    QgsCoordinateTransform,
     QgsRectangle,
     QgsMapRendererParallelJob,
+    QgsPointXY,
 )
-from qgis.PyQt.QtGui import QImage, QPainter
+from qgis.PyQt.QtGui import QImage, QPainter, QColor
 from qgis.PyQt.QtCore import QSize
-from qgis.core import QgsPointXY
-from qgis.PyQt.QtGui import QColor
-
 
 # -------------------------
 # Load environment variables
 # -------------------------
 load_dotenv()
-
 
 PG_PARAMS = {
     "host": os.getenv("PG_HOST"),
@@ -40,9 +38,10 @@ PROJECT_NAME = os.getenv("PROJECT_NAME", "WRR Images")
 PROJECT_PATH = f"/tmp/{PROJECT_NAME.replace(' ', '_')}.qgz"
 OUTPUT_IMAGE = os.getenv("OUTPUT_IMAGE", "/tmp/rendered_map.png")
 
-# Map render settings
-CENTER_LAT = float(os.getenv("CENTER_LAT", -13583211.8))
-CENTER_LON = float(os.getenv("CENTER_LON", 4654056.0))
+# These are in EPSG:3857 now — no need to transform
+CENTER_X = float(os.getenv("CENTER_X", -13583211.8))  # formerly CENTER_LON
+CENTER_Y = float(os.getenv("CENTER_Y", 4654056.0))  # formerly CENTER_LAT
+
 SCALE = int(os.getenv("SCALE", 5000))
 DPI = int(os.getenv("DPI", 96))
 WIDTH = int(os.getenv("WIDTH", 1024))
@@ -101,19 +100,14 @@ map_settings.setLayers(layers)
 map_settings.setOutputSize(QSize(WIDTH, HEIGHT))
 map_settings.setBackgroundColor(QColor("white"))
 
-from qgis.core import QgsCoordinateReferenceSystem
+# Use EPSG:3857 directly (you’re providing meters)
+crs = QgsCoordinateReferenceSystem("EPSG:3857")
+map_settings.setDestinationCrs(crs)
 
-# Force destination CRS to avoid PROJ pipeline errors
-forced_crs = QgsCoordinateReferenceSystem("EPSG:3857")  # or "EPSG:4326"
-map_settings.setDestinationCrs(forced_crs)
+# Use provided center point (no CRS transform needed)
+center_pt = QgsPointXY(CENTER_X, CENTER_Y)
 
-
-# Convert center point
-crs_src = QgsCoordinateReferenceSystem("EPSG:4326")
-crs_dest = map_settings.destinationCrs()
-transform = QgsCoordinateTransform(crs_src, crs_dest, project)
-center_pt = transform.transform(QgsPointXY(CENTER_LON, CENTER_LAT))
-# Calculate extent
+# Calculate extent in meters
 meters_per_pixel = SCALE / DPI * 0.0254
 extent_width = WIDTH * meters_per_pixel
 extent_height = HEIGHT * meters_per_pixel
