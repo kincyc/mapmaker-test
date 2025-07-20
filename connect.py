@@ -17,7 +17,8 @@ from qgis.core import (
     QgsMapRendererParallelJob,
 )
 from qgis.PyQt.QtGui import QImage, QPainter
-from qgis.PyQt.QtCore import QSize, QPointF
+from qgis.PyQt.QtCore import QSize
+from qgis.core import QgsPointXY
 from qgis.PyQt.QtGui import QColor
 
 
@@ -104,8 +105,7 @@ map_settings.setBackgroundColor(QColor("white"))
 crs_src = QgsCoordinateReferenceSystem("EPSG:4326")
 crs_dest = map_settings.destinationCrs()
 transform = QgsCoordinateTransform(crs_src, crs_dest, project)
-center_pt = transform.transform(QPointF(CENTER_LON, CENTER_LAT))
-
+center_pt = transform.transform(QgsPointXY(CENTER_LON, CENTER_LAT))
 # Calculate extent
 meters_per_pixel = SCALE / DPI * 0.0254
 extent_width = WIDTH * meters_per_pixel
