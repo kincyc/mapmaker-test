@@ -46,7 +46,7 @@ SCALE = int(os.getenv("SCALE", 5000))
 DPI = int(os.getenv("DPI", 96))
 WIDTH = int(os.getenv("WIDTH", 1024))
 HEIGHT = int(os.getenv("HEIGHT", 768))
-LAYER_NAMES = ["Footprint Pushpin", "USDA WRC 2024", "OpenStreetMap"]
+LAYER_NAMES = ["Structure Footprints Pushpin", "USDA WRC 2024", "OpenStreetMap"]
 
 # -------------------------
 # Step 1: Extract QGIS Project from DB
