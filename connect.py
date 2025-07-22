@@ -123,6 +123,10 @@ print(f"Layer names: {[layer.name() for layer in all_layers]}")
 layers = [
     layer for layer in all_layers if any(name in layer.name() for name in LAYER_NAMES)
 ]
+
+print(f"Layers: {layers}")
+print(f"LAYER_NAMES: {LAYER_NAMES}")
+
 if len(layers) < len(LAYER_NAMES):
     raise Exception("Not all required layers found")
 
