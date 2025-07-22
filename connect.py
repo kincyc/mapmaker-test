@@ -64,7 +64,7 @@ PROJECT_NAME = os.getenv("PROJECT_NAME", "wrr_calfire")
 PROJECT_PATH = f"/tmp/{PROJECT_NAME.replace(' ', '_')}.qgz"
 OUTPUT_IMAGE = os.getenv("OUTPUT_IMAGE", "/tmp/rendered_map.png")
 
-# Reproject center coordinates from EPSG:4326 → 3857
+# transform center coordinates from EPSG:4326 → 3857
 crs_src = QgsCoordinateReferenceSystem("EPSG:4326")
 crs_dest = QgsCoordinateReferenceSystem("EPSG:3857")
 xform = QgsCoordinateTransform(crs_src, crs_dest, QgsProject.instance())
@@ -138,7 +138,7 @@ if len(layers) < len(LAYER_NAMES):
 
 
 # Desired order of layer names (top to bottom in render)
-ordered_names = [ "calfire", "OpenStreetMap", "pushpins"]
+ordered_names = [ "pushpins", "calfire", "OpenStreetMap"]
 layer_dict = {layer.name(): layer for layer in all_layers}
 layers = [layer_dict[name] for name in ordered_names if name in layer_dict]
 
@@ -147,19 +147,19 @@ layers = [layer_dict[name] for name in ordered_names if name in layer_dict]
 # add a pushpin 
 # ================================================
 
-pushpin_layer = QgsVectorLayer("Point?crs=EPSG:4326", "Pushpin", "memory")
-prov = pushpin_layer.dataProvider()
+# pushpin_layer = QgsVectorLayer("Point?crs=EPSG:4326", "Pushpin", "memory")
+# prov = pushpin_layer.dataProvider()
 
-prov.addAttributes([QgsField("name", QVariant.String)])
-pushpin_layer.updateFields()
+# prov.addAttributes([QgsField("name", QVariant.String)])
+# pushpin_layer.updateFields()
 
-pushpin = QgsFeature()
-pushpin.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(-122.0200417, 38.5261676)))
-pushpin.setAttributes(["Here"])
-prov.addFeature(pushpin)
-pushpin_layer.updateExtents()
+# pushpin = QgsFeature()
+# pushpin.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(-122.0200417, 38.5261676)))
+# pushpin.setAttributes(["Here"])
+# prov.addFeature(pushpin)
+# pushpin_layer.updateExtents()
 
-layers.insert(0, pushpin_layer)
+# layers.insert(0, pushpin_layer)
 
 # -------------------------
 # Step 3: Set up map and render
