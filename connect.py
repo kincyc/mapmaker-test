@@ -20,6 +20,11 @@ from qgis.core import (
     QgsPointXY,
     QgsCoordinateTransform,
     QgsCoordinateTransformContext,
+    QgsVectorLayer,
+    QgsFeature,
+    QgsGeometry,
+    QgsField,
+    QVariant,
 )
 from qgis.PyQt.QtGui import QImage, QPainter, QColor
 from qgis.PyQt.QtCore import QSize
@@ -138,7 +143,26 @@ layer_dict = {layer.name(): layer for layer in all_layers}
 layers = [layer_dict[name] for name in ordered_names if name in layer_dict]
 
 
+# ================================================
+# add a pushpin 
+# ================================================
 
+# 1. Create a temporary point layer (in EPSG:4326 or match your map CRS)
+pushpin_layer = QgsVectorLayer("Point?crs=EPSG:4326", "Pushpin", "memory")
+prov = pushpin_layer.dataProvider()
+
+# 2. Add a dummy field if needed
+prov.addAttributes([QgsField("name", QVariant.String)])
+pushpin_layer.updateFields()
+
+# 3. Create a feature with your lat/lon
+pushpin = QgsFeature()
+pushpin.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(-122.0200417, 38.5261676)))
+pushpin.setAttributes(["Here"])
+prov.addFeature(pushpin)
+pushpin_layer.updateExtents()
+
+layers.insert(0, pushpin_layer)
 
 # -------------------------
 # Step 3: Set up map and render
