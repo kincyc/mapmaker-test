@@ -131,6 +131,17 @@ print(f"LAYER_NAMES: {LAYER_NAMES}")
 if len(layers) < len(LAYER_NAMES):
     raise Exception("Not all required layers found")
 
+
+# Desired order of layer names (top to bottom in render)
+ordered_names = ["pushpins", "calfire", "OpenStreetMap"]
+
+# Build ordered list of QgsMapLayer objects
+layer_dict = {layer.name(): layer for layer in all_layers}
+layers = [layer_dict[name] for name in ordered_names if name in layer_dict]
+
+
+
+
 # -------------------------
 # Step 3: Set up map and render
 # -------------------------
