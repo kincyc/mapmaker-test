@@ -34,7 +34,7 @@ PG_PARAMS = {
     "password": os.getenv("PG_PASSWORD"),
 }
 
-PROJECT_NAME = os.getenv("PROJECT_NAME", "WRR Images")
+PROJECT_NAME = os.getenv("PROJECT_NAME", "WRR Images_mb")
 PROJECT_PATH = f"/tmp/{PROJECT_NAME.replace(' ', '_')}.qgz"
 OUTPUT_IMAGE = os.getenv("OUTPUT_IMAGE", "/tmp/rendered_map.png")
 
