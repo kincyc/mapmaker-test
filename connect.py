@@ -28,7 +28,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtGui import QImage, QPainter, QColor
 from qgis.PyQt.QtCore import QSize
-
+from qgis.PyQt.QtCore import QVariant
 # -------------------------
 # Command-line Argument Parsing
 # -------------------------
