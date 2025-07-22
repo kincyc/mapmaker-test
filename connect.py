@@ -2,6 +2,7 @@ import os
 import psycopg2
 import site
 import sys
+import argparse
 
 # Inject venv + system paths
 site.addsitedir("/home/ubuntu/mapmaker-test/.venv/lib/python3.10/site-packages")
@@ -17,10 +18,30 @@ from qgis.core import (
     QgsRectangle,
     QgsMapRendererParallelJob,
     QgsPointXY,
+    QgsCoordinateTransform,
+    QgsCoordinateTransformContext,
 )
 from qgis.PyQt.QtGui import QImage, QPainter, QColor
 from qgis.PyQt.QtCore import QSize
 
+# -------------------------
+# Command-line Argument Parsing
+# -------------------------
+parser = argparse.ArgumentParser()
+parser.add_argument("--scale", type=int, default=5000)
+parser.add_argument("--dpi", type=int, default=96)
+parser.add_argument("--width", type=int, default=1024)
+parser.add_argument("--height", type=int, default=768)
+parser.add_argument("--center_lat", type=float, default=38.52637)
+parser.add_argument("--center_lon", type=float, default=-122.01996)
+args = parser.parse_args()
+
+SCALE = args.scale
+DPI = args.dpi
+WIDTH = args.width
+HEIGHT = args.height
+CENTER_LAT = args.center_lat
+CENTER_LON = args.center_lon
 # -------------------------
 # Load environment variables
 # -------------------------
@@ -38,9 +59,16 @@ PROJECT_NAME = os.getenv("PROJECT_NAME", "WRR Images_mb")
 PROJECT_PATH = f"/tmp/{PROJECT_NAME.replace(' ', '_')}.qgz"
 OUTPUT_IMAGE = os.getenv("OUTPUT_IMAGE", "/tmp/rendered_map.png")
 
-# These are in EPSG:3857 now — no need to transform
-CENTER_X = float(os.getenv("CENTER_X", -13583211.8))  # formerly CENTER_LON
-CENTER_Y = float(os.getenv("CENTER_Y", 4654056.0))  # formerly CENTER_LAT
+# Reproject center coordinates from EPSG:4326 → 3857
+crs_src = QgsCoordinateReferenceSystem("EPSG:4326")
+crs_dest = QgsCoordinateReferenceSystem("EPSG:3857")
+xform = QgsCoordinateTransform(crs_src, crs_dest, QgsProject.instance())
+
+pt_4326 = QgsPointXY(CENTER_LON, CENTER_LAT)
+pt_3857 = xform.transform(pt_4326)
+
+CENTER_X = pt_3857.x()
+CENTER_Y = pt_3857.y()
 
 SCALE = int(os.getenv("SCALE", 5000))
 DPI = int(os.getenv("DPI", 96))
