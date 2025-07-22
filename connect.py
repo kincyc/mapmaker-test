@@ -19,12 +19,12 @@ from qgis.core import (
     QgsMapRendererParallelJob,
     QgsPointXY,
     QgsCoordinateTransform,
-    QgsCoordinateTransformContext,
+    
     QgsVectorLayer,
     QgsFeature,
     QgsGeometry,
     QgsField,
-    QVariant,
+    
 )
 from qgis.PyQt.QtGui import QImage, QPainter, QColor
 from qgis.PyQt.QtCore import QSize
