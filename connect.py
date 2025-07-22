@@ -103,6 +103,10 @@ conn.close()
 # Step 2: Initialize QGIS
 # -------------------------
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
+QgsApplication.setPrefixPath("/usr", True)
+QgsApplication.setPluginPath("/usr/lib/qgis/plugins")
+QgsApplication.setDefaultSvgPaths(['/usr/share/qgis/svg'])
+
 app = QgsApplication([], False)
 app.setPrefixPath("/usr", True)
 app.initQgis()
