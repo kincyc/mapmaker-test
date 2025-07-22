@@ -86,6 +86,8 @@ if not project.read(PROJECT_PATH):
 
 # Filter layers
 all_layers = project.mapLayers().values()
+print(f"Found {len(all_layers)} layers in project")
+print(f"Layer names: {[layer.name() for layer in all_layers]}")
 layers = [
     layer for layer in all_layers if any(name in layer.name() for name in LAYER_NAMES)
 ]
