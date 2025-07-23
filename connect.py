@@ -107,10 +107,10 @@ conn.close()
 # -------------------------
 # Step 2: Initialize QGIS
 # -------------------------
-os.environ["QT_QPA_PLATFORM"] = "offscreen"
-QgsApplication.setPrefixPath("/usr", True)
-QgsApplication.setPluginPath("/usr/lib/qgis/plugins")
-QgsApplication.setDefaultSvgPaths(['/usr/share/qgis/svg'])
+os.environ["QT_QPA_PLATFORM"] = "offscreen"         # this is needed for the headless rendering
+# QgsApplication.setPrefixPath("/usr", True)
+# QgsApplication.setPluginPath("/usr/lib/qgis/plugins")
+# QgsApplication.setDefaultSvgPaths(['/usr/share/qgis/svg'])
 
 app = QgsApplication([], False)
 app.setPrefixPath("/usr", True)
@@ -121,7 +121,7 @@ project = QgsProject.instance()
 if not project.read(PROJECT_PATH):
     raise Exception("Failed to load project")
 
-# Filter layers
+# get all the layers
 all_layers = project.mapLayers().values()
 
 # Create a name-to-layer map
