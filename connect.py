@@ -149,7 +149,8 @@ prov.addFeature(pushpin)
 pushpin_layer.updateExtents()
 
 qml_path = "/home/ubuntu/mapmaker-test/pushpin.qml"  # replace with your actual path
-pushpin_layer.loadNamedStyle(qml_path)
+success, error_message = pushpin_layer.loadNamedStyle(qml_path)
+print(f"Style load success: {success}, error: {error_message}")
 pushpin_layer.updateExtents()
 pushpin_layer.triggerRepaint()
 layers.insert(0, pushpin_layer)
@@ -182,6 +183,13 @@ extent = QgsRectangle(
 map_settings.setExtent(extent)
 
 # Render image
+
+renderer = pushpin_layer.renderer()
+print(f"Renderer type: {renderer.type()}")
+print("Renderer dump:")
+print(renderer.dump())
+
+
 image = QImage(QSize(WIDTH, HEIGHT), QImage.Format_ARGB32_Premultiplied)
 image.fill(0)
 painter = QPainter(image)
