@@ -1,0 +1,42 @@
+This is a guide to install QGIS and Python bindings on a Ubuntu 22.04 LTS machine.
+It is based on the instructions from the QGIS documentation:
+https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/vector_properties.html#vector-properties
+It is also based on the instructions from the QGIS documentation:
+https://docs.qgis.org/latest/en/docs/user_manual/working_with_vector/vector_properties.html#vector-properties
+
+# 1. Update system
+sudo apt update
+sudo apt upgrade -y
+
+# 2. Add QGIS repository and key
+
+sudo wget -O /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg
+
+echo "Types: deb
+URIs: https://qgis.org/ubuntu-ltr
+Suites: jammy
+Architectures: amd64
+Components: main
+Signed-By: /etc/apt/keyrings/qgis-archive-keyring.gpg" | sudo tee /etc/apt/sources.list.d/qgis.sources > /dev/null
+
+# 3. Update again and install QGIS and Python bindings
+sudo apt update
+sudo apt install -y qgis python3-qgis proj-bin proj-data
+
+# 4. (Optional) Add ubuntugis PPA if you need latest unstable geospatial packages
+sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable -y
+sudo apt update
+sudo apt install -y qgis python3-qgis
+sudo apt install -y python3-pip
+
+# 5. Install required Python packages
+pip install psycopg2-binary python-dotenv
+
+# 6. Clone your repo
+git clone https://github.com/kincyc/mapmaker-test.git
+cd mapmaker-test/
+
+
+
+# 9. (Optional) Test QGIS import
+python3 -c "from qgis.core import QgsApplication; app = QgsApplication([], False); app.initQgis(); print('QGIS loaded')"
