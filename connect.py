@@ -104,6 +104,8 @@ print(f"Project saved to: {PROJECT_PATH}")
 cur.close()
 conn.close()
 
+print("retrieved project from db")
+
 # -------------------------
 # Step 2: Initialize QGIS
 # -------------------------
@@ -115,12 +117,13 @@ os.environ["QT_QPA_PLATFORM"] = "offscreen"         # this is needed for the hea
 app = QgsApplication([], False)
 app.setPrefixPath("/usr", True)
 app.initQgis()
+print("initialized qgis")
 
 # Load project
 project = QgsProject.instance()
 if not project.read(PROJECT_PATH):
     raise Exception("Failed to load project")
-
+print("loaded project")
 # get all the layers
 all_layers = project.mapLayers().values()
 
@@ -130,7 +133,7 @@ sorted_names = sorted(layer_dict.keys(), key=lambda x: x.lower())  # case-insens
 
 # Build ordered layer list (top to bottom)
 layers = [layer_dict[name] for name in sorted_names]
-
+print("built layer list")
 
 # ================================================
 # add a pushpin 
@@ -151,7 +154,7 @@ qml_path = "/home/ubuntu/mapmaker-test/pushpin.qml"  # replace with your actual 
 pushpin_layer.updateExtents()
 pushpin_layer.triggerRepaint()
 layers.insert(0, pushpin_layer)
-
+print("added pushpin layer")
 # -------------------------
 # Step 3: Set up map and render
 # -------------------------
@@ -177,12 +180,12 @@ extent = QgsRectangle(
     center_pt.y() + extent_height / 2,
 )
 map_settings.setExtent(extent)
-
+print("set extent")
 # Render image
 image = QImage(QSize(WIDTH, HEIGHT), QImage.Format_ARGB32_Premultiplied)
 image.fill(0)
 painter = QPainter(image)
-
+print("created painter")
 job = QgsMapRendererParallelJob(map_settings)
 job.start()
 job.waitForFinished()
