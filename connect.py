@@ -151,7 +151,10 @@ prov.addFeature(pushpin)
 pushpin_layer.updateExtents()
 
 qml_path = "/home/ubuntu/mapmaker-test/pushpin.qml"  # replace with your actual path
-pushpin_layer.updateExtents()
+pushpin_layer.loadNamedStyle(qml_path)
+success, error = pushpin_layer.loadNamedStyle(qml_path)
+print(f"Style loaded: {success}, error: {error}")
+
 pushpin_layer.triggerRepaint()
 layers.insert(0, pushpin_layer)
 print("added pushpin layer")
