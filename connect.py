@@ -150,6 +150,7 @@ pushpin_layer.updateExtents()
 
 qml_path = "/home/ubuntu/mapmaker-test/pushpin.qml"  # replace with your actual path
 pushpin_layer.loadNamedStyle(qml_path)
+pushpin_layer.updateExtents()
 pushpin_layer.triggerRepaint()
 layers.insert(0, pushpin_layer)
 
