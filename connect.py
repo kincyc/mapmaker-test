@@ -1,8 +1,6 @@
-import os
+import os, site, sys, argparse, time
 import psycopg2
-import site
-import sys
-import argparse
+
 
 # Inject venv + system paths
 site.addsitedir("/home/ubuntu/mapmaker-test/.venv/lib/python3.10/site-packages")
@@ -19,7 +17,6 @@ from qgis.core import (
     QgsMapRendererParallelJob,
     QgsPointXY,
     QgsCoordinateTransform,
-    
     QgsVectorLayer,
     QgsFeature,
     QgsGeometry,
@@ -84,6 +81,7 @@ HEIGHT = int(os.getenv("HEIGHT", 768))
 # -------------------------
 # Step 1: Extract QGIS Project from DB
 # -------------------------
+t0 = time.time()
 print(f"Connecting to DB to fetch project: {PROJECT_NAME}")
 conn = psycopg2.connect(**PG_PARAMS)
 cur = conn.cursor()
@@ -103,16 +101,16 @@ print(f"Project saved to: {PROJECT_PATH}")
 
 cur.close()
 conn.close()
-
+t1 = time.time()
 print("retrieved project from db")
+print(f"[TIMER] Project load time: {t1 - t0:.2f}s")
+
 
 # -------------------------
 # Step 2: Initialize QGIS
 # -------------------------
 os.environ["QT_QPA_PLATFORM"] = "offscreen"         # this is needed for the headless rendering
-# QgsApplication.setPrefixPath("/usr", True)
-# QgsApplication.setPluginPath("/usr/lib/qgis/plugins")
-# QgsApplication.setDefaultSvgPaths(['/usr/share/qgis/svg'])
+t2 = time.time()
 
 app = QgsApplication([], False)
 app.setPrefixPath("/usr", True)
@@ -124,6 +122,9 @@ project = QgsProject.instance()
 if not project.read(PROJECT_PATH):
     raise Exception("Failed to load project")
 print("loaded project")
+t3 = time.time()
+print(f"[TIMER] QGIS init + project load time: {t3 - t2:.2f}s")
+
 # get all the layers
 all_layers = project.mapLayers().values()
 
@@ -197,3 +198,7 @@ painter.end()
 
 print(f"Rendered image saved to: {OUTPUT_IMAGE}")
 app.exitQgis()
+
+t4 = time.time()
+print(f"[TIMER] Remaining steps (pushpin + render): {t4 - t3:.2f}s")
+print(f"[TIMER] TOTAL: {t4 - t0:.2f}s")
