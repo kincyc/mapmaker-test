@@ -160,7 +160,6 @@ map_settings.setLayers(layers)
 map_settings.setOutputSize(QSize(WIDTH, HEIGHT))
 map_settings.setBackgroundColor(QColor("white"))
 
-# Use EPSG:3857 directly (you’re providing meters)
 crs = QgsCoordinateReferenceSystem("EPSG:3857")
 map_settings.setDestinationCrs(crs)
 
@@ -180,13 +179,6 @@ extent = QgsRectangle(
 map_settings.setExtent(extent)
 
 # Render image
-
-renderer = pushpin_layer.renderer()
-print(f"Renderer type: {renderer.type()}")
-print("Renderer dump:")
-print(renderer.dump())
-
-
 image = QImage(QSize(WIDTH, HEIGHT), QImage.Format_ARGB32_Premultiplied)
 image.fill(0)
 painter = QPainter(image)
