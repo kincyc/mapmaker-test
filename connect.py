@@ -138,8 +138,7 @@ layers = [layer_dict[name] for name in sorted_names]
 
 pushpin_layer = QgsVectorLayer("Point?crs=EPSG:3857", "Pushpin", "memory")
 prov = pushpin_layer.dataProvider()
-
-prov.addAttributes([QgsField("name", QVariant.String)])
+prov.addAttributes([QgsField(name="name", type=QVariant.String)])
 pushpin_layer.updateFields()
 
 pushpin = QgsFeature()
@@ -149,8 +148,6 @@ prov.addFeature(pushpin)
 pushpin_layer.updateExtents()
 
 qml_path = "/home/ubuntu/mapmaker-test/pushpin.qml"  # replace with your actual path
-success, error_message = pushpin_layer.loadNamedStyle(qml_path)
-print(f"Style load success: {success}, error: {error_message}")
 pushpin_layer.updateExtents()
 pushpin_layer.triggerRepaint()
 layers.insert(0, pushpin_layer)
