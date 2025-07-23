@@ -37,16 +37,18 @@ parser.add_argument("--scale", type=int, default=5000)
 parser.add_argument("--dpi", type=int, default=96)
 parser.add_argument("--width", type=int, default=1024)
 parser.add_argument("--height", type=int, default=768)
-parser.add_argument("--center_lat", type=float, default=38.52637)
-parser.add_argument("--center_lon", type=float, default=-122.01996)
+parser.add_argument("--lat", type=float, default=38.52637)
+parser.add_argument("--lon", type=float, default=-122.01996)
+parser.add_argument("--project", type=str, default="wrr_calfire")
 args = parser.parse_args()
 
 SCALE = args.scale
 DPI = args.dpi
 WIDTH = args.width
 HEIGHT = args.height
-CENTER_LAT = args.center_lat
-CENTER_LON = args.center_lon
+CENTER_LAT = args.lat
+CENTER_LON = args.lon
+PROJECT_NAME = args.project
 # -------------------------
 # Load environment variables
 # -------------------------
@@ -60,7 +62,6 @@ PG_PARAMS = {
     "password": os.getenv("PG_PASSWORD"),
 }
 
-PROJECT_NAME = os.getenv("PROJECT_NAME", "wrr_calfire")
 PROJECT_PATH = f"/tmp/{PROJECT_NAME.replace(' ', '_')}.qgz"
 OUTPUT_IMAGE = os.getenv("OUTPUT_IMAGE", "/tmp/rendered_map.png")
 
@@ -79,7 +80,6 @@ SCALE = int(os.getenv("SCALE", 5000))
 DPI = int(os.getenv("DPI", 96))
 WIDTH = int(os.getenv("WIDTH", 1024))
 HEIGHT = int(os.getenv("HEIGHT", 768))
-LAYER_NAMES = ["pushpins", "calfire", "OpenStreetMap"]
 
 # -------------------------
 # Step 1: Extract QGIS Project from DB
@@ -123,43 +123,36 @@ if not project.read(PROJECT_PATH):
 
 # Filter layers
 all_layers = project.mapLayers().values()
-print(f"Found {len(all_layers)} layers in project")
-print(f"Layer names: {[layer.name() for layer in all_layers]}")
-print(f"layer names: {all_layers}")
-layers = [
-    layer for layer in all_layers if any(name in layer.name() for name in LAYER_NAMES)
-]
 
-print(f"Layers: {layers}")
-print(f"LAYER_NAMES: {LAYER_NAMES}")
-
-if len(layers) < len(LAYER_NAMES):
-    raise Exception("Not all required layers found")
-
-
-# Desired order of layer names (top to bottom in render)
-ordered_names = [ "pushpins", "calfire", "OpenStreetMap"]
+# Create a name-to-layer map
 layer_dict = {layer.name(): layer for layer in all_layers}
-layers = [layer_dict[name] for name in ordered_names if name in layer_dict]
+sorted_names = sorted(layer_dict.keys(), key=lambda x: x.lower())  # case-insensitive
+
+# Build ordered layer list (top to bottom)
+layers = [layer_dict[name] for name in sorted_names]
 
 
 # ================================================
 # add a pushpin 
 # ================================================
 
-# pushpin_layer = QgsVectorLayer("Point?crs=EPSG:4326", "Pushpin", "memory")
-# prov = pushpin_layer.dataProvider()
+pushpin_layer = QgsVectorLayer("Point?crs=EPSG:4326", "Pushpin", "memory")
+prov = pushpin_layer.dataProvider()
 
-# prov.addAttributes([QgsField("name", QVariant.String)])
-# pushpin_layer.updateFields()
+prov.addAttributes([QgsField("name", QVariant.String)])
+pushpin_layer.updateFields()
 
-# pushpin = QgsFeature()
-# pushpin.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(-122.0200417, 38.5261676)))
-# pushpin.setAttributes(["Here"])
-# prov.addFeature(pushpin)
-# pushpin_layer.updateExtents()
+pushpin = QgsFeature()
+pushpin.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(CENTER_LON, CENTER_LAT)))
+pushpin.setAttributes(["Here"])
+prov.addFeature(pushpin)
+pushpin_layer.updateExtents()
 
-# layers.insert(0, pushpin_layer)
+qml_path = "/home/ubuntu/mapmaker-test/pushpin.qml"  # replace with your actual path
+pushpin_layer.loadNamedStyle(qml_path)
+pushpin_layer.triggerRepaint()
+
+layers.insert(0, pushpin_layer)
 
 # -------------------------
 # Step 3: Set up map and render
